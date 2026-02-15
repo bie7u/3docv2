@@ -5,9 +5,9 @@ export const PropertiesPanel = () => {
 
   const selectedNode = nodes.find((n) => n.id === selectedNodeId);
 
-  const handleUpdate = (field: string, value: any) => {
+  const handleUpdate = (field: string, value: string) => {
     if (!selectedNodeId) return;
-    updateNode(selectedNodeId, { [field]: value } as any);
+    updateNode(selectedNodeId, { [field]: value });
   };
 
   const handleCameraPositionUpdate = (axis: 'x' | 'y' | 'z', value: number) => {

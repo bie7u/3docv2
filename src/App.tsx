@@ -16,8 +16,7 @@ function App() {
       setNodes(sampleNodes);
       setEdges(sampleEdges);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [nodes.length, setNodes, setEdges]);
 
   return (
     <div className="h-screen flex flex-col bg-gray-900">
