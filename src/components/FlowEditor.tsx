@@ -3,6 +3,9 @@ import ReactFlow, {
   Background,
   Controls,
   MiniMap,
+  NodeChange,
+  EdgeChange,
+  Connection,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { useWorkflowStore } from '../store/workflowStore';
@@ -11,17 +14,17 @@ const FlowEditor: React.FC = () => {
   const { nodes, edges, onNodesChange, onEdgesChange, onConnect } = useWorkflowStore();
 
   const handleNodesChange = useCallback(
-    (changes: any) => onNodesChange(changes),
+    (changes: NodeChange[]) => onNodesChange(changes),
     [onNodesChange]
   );
 
   const handleEdgesChange = useCallback(
-    (changes: any) => onEdgesChange(changes),
+    (changes: EdgeChange[]) => onEdgesChange(changes),
     [onEdgesChange]
   );
 
   const handleConnect = useCallback(
-    (connection: any) => onConnect(connection),
+    (connection: Connection) => onConnect(connection),
     [onConnect]
   );
 

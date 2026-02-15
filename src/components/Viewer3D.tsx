@@ -72,7 +72,7 @@ const ConnectionLine: React.FC<ConnectionLineProps> = ({ start, end }) => {
           itemSize={3}
         />
       </bufferGeometry>
-      <lineBasicMaterial color="#666666" linewidth={2} />
+      <lineBasicMaterial color="#666666" />
     </line>
   );
 };
