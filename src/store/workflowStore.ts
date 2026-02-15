@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Node, Edge } from 'reactflow';
+import { Node, Edge, applyNodeChanges, applyEdgeChanges, addEdge, Connection, NodeChange, EdgeChange } from 'reactflow';
 
 export interface WorkflowNode extends Node {
   data: {
@@ -12,9 +12,9 @@ interface WorkflowStore {
   edges: Edge[];
   setNodes: (nodes: WorkflowNode[]) => void;
   setEdges: (edges: Edge[]) => void;
-  onNodesChange: (changes: any) => void;
-  onEdgesChange: (changes: any) => void;
-  onConnect: (connection: any) => void;
+  onNodesChange: (changes: NodeChange[]) => void;
+  onEdgesChange: (changes: EdgeChange[]) => void;
+  onConnect: (connection: Connection) => void;
 }
 
 export const useWorkflowStore = create<WorkflowStore>((set, get) => ({
@@ -53,35 +53,18 @@ export const useWorkflowStore = create<WorkflowStore>((set, get) => ({
   setNodes: (nodes) => set({ nodes }),
   setEdges: (edges) => set({ edges }),
   onNodesChange: (changes) => {
-    const { nodes } = get();
-    const updatedNodes = nodes.map(node => {
-      const change = changes.find((c: any) => c.id === node.id);
-      if (change) {
-        if (change.type === 'position' && change.position) {
-          return { ...node, position: change.position };
-        }
-        if (change.type === 'remove') {
-          return null;
-        }
-      }
-      return node;
-    }).filter(Boolean) as WorkflowNode[];
-    set({ nodes: updatedNodes });
+    set({
+      nodes: applyNodeChanges(changes, get().nodes) as WorkflowNode[],
+    });
   },
   onEdgesChange: (changes) => {
-    const { edges } = get();
-    const updatedEdges = edges.filter(edge => {
-      return !changes.find((c: any) => c.id === edge.id && c.type === 'remove');
+    set({
+      edges: applyEdgeChanges(changes, get().edges),
     });
-    set({ edges: updatedEdges });
   },
   onConnect: (connection) => {
-    const { edges } = get();
-    const newEdge = {
-      id: `e${connection.source}-${connection.target}`,
-      source: connection.source,
-      target: connection.target,
-    };
-    set({ edges: [...edges, newEdge] });
+    set({
+      edges: addEdge(connection, get().edges),
+    });
   },
 }));

@@ -1,6 +1,6 @@
-import React, { useMemo } from 'react';
-import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Text, Line } from '@react-three/drei';
+import React, { useMemo, useRef } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { OrbitControls, Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { useWorkflowStore } from '../store/workflowStore';
 import { calculate3DPositions, Node3DPosition } from '../utils/layout3D';
@@ -10,34 +10,35 @@ interface NodeBoxProps {
 }
 
 const NodeBox: React.FC<NodeBoxProps> = ({ position }) => {
+  const meshRef = useRef<THREE.Mesh>(null);
   const color = position.isParallel ? '#4CAF50' : '#2196F3';
 
   return (
     <group position={[position.position.x, position.position.y, position.position.z]}>
-      <mesh>
+      <mesh ref={meshRef}>
         <boxGeometry args={[2, 1, 1]} />
         <meshStandardMaterial color={color} />
       </mesh>
-      <Text
-        position={[0, 0, 0.6]}
-        fontSize={0.3}
-        color="white"
-        anchorX="center"
-        anchorY="middle"
+      <Html
+        position={[0, 0, 0]}
+        center
+        distanceFactor={8}
+        style={{
+          color: 'white',
+          fontSize: '14px',
+          fontWeight: 'bold',
+          textAlign: 'center',
+          pointerEvents: 'none',
+          userSelect: 'none',
+        }}
       >
-        {position.label}
-      </Text>
-      {position.isParallel && (
-        <Text
-          position={[0, -0.7, 0.6]}
-          fontSize={0.15}
-          color="white"
-          anchorX="center"
-          anchorY="middle"
-        >
-          (Parallel)
-        </Text>
-      )}
+        <div>
+          {position.label}
+          {position.isParallel && (
+            <div style={{ fontSize: '10px', marginTop: '2px' }}>(Parallel)</div>
+          )}
+        </div>
+      </Html>
     </group>
   );
 };
@@ -48,14 +49,31 @@ interface ConnectionLineProps {
 }
 
 const ConnectionLine: React.FC<ConnectionLineProps> = ({ start, end }) => {
-  const points = [start, end];
+  const points = useMemo(() => {
+    const curve = new THREE.QuadraticBezierCurve3(
+      start,
+      new THREE.Vector3(
+        (start.x + end.x) / 2,
+        (start.y + end.y) / 2,
+        (start.z + end.z) / 2
+      ),
+      end
+    );
+    return curve.getPoints(50);
+  }, [start, end]);
 
   return (
-    <Line
-      points={points}
-      color="#666666"
-      lineWidth={2}
-    />
+    <line>
+      <bufferGeometry>
+        <bufferAttribute
+          attach="attributes-position"
+          count={points.length}
+          array={new Float32Array(points.flatMap(p => [p.x, p.y, p.z]))}
+          itemSize={3}
+        />
+      </bufferGeometry>
+      <lineBasicMaterial color="#666666" linewidth={2} />
+    </line>
   );
 };
 
