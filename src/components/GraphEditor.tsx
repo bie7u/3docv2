@@ -61,7 +61,7 @@ export const GraphEditor = () => {
   );
 
   const onNodeDragStop = useCallback(
-    (_event: any, node: Node) => {
+    (_event: React.MouseEvent, node: Node) => {
       const updatedNodes = storeNodes.map((n) =>
         n.id === node.id ? { ...n, position: node.position } : n
       );
@@ -71,14 +71,14 @@ export const GraphEditor = () => {
   );
 
   const onNodeClick = useCallback(
-    (_event: any, node: Node) => {
+    (_event: React.MouseEvent, node: Node) => {
       setSelectedNodeId(node.id);
     },
     [setSelectedNodeId]
   );
 
   const onEdgeClick = useCallback(
-    (_event: any, edge: Edge) => {
+    (_event: React.MouseEvent, edge: Edge) => {
       if (!previewMode) {
         // Allow edge deletion in edit mode
         const updatedEdges = storeEdges.filter((e) => e.id !== edge.id);

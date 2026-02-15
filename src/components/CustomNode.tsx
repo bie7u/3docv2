@@ -2,7 +2,13 @@ import { memo } from 'react';
 import { Handle, Position } from 'reactflow';
 import type { NodeProps } from 'reactflow';
 
-export const CustomNode = memo(({ data, type }: NodeProps) => {
+interface CustomNodeData {
+  title: string;
+  description: string;
+  isSelected?: boolean;
+}
+
+export const CustomNode = memo(({ data, type }: NodeProps<CustomNodeData>) => {
   const getNodeStyle = () => {
     switch (type) {
       case 'start':
@@ -16,7 +22,7 @@ export const CustomNode = memo(({ data, type }: NodeProps) => {
     }
   };
 
-  const isSelected = (data as any).isSelected;
+  const isSelected = data.isSelected ?? false;
 
   return (
     <div
